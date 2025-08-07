@@ -1,67 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_x_darsi/model/product_model.dart';
-import 'package:get_x_darsi/view/screens/cart_screen.dart';
 import 'package:get_x_darsi/viewmodel/control.dart';
+import 'package:get_x_darsi/viewmodel/product_controller.dart';
+import 'cart_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final productController = Get.find<ProductController>();
+  final cartController = Get.find<CartController>();
+
+  HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final CartController controller = Get.put(CartController());
-
-    final List<Product> products = List.generate(
-      6,
-      (index) => Product(
-        id: index,
-        name: "Mahsulot ${index + 1}",
-        price: (10 + index * 5).toDouble(),
-      ),
-    );
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Mahsulotlar"),
+        title: Text('Products'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () => Get.to(() => const CartScreen()),
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () => Get.to(() => CartScreen()),
           ),
         ],
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(12),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 3 / 4,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final p = products[index];
-          return Card(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text(
-                  p.name,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text("${p.price.toStringAsFixed(0)} so'm"),
-                ElevatedButton(
-                  onPressed: () => controller.addProduct(p),
-                  child: const Text("Savatchaga qo‘shish"),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+      body: Obx(() {
+        if (productController.isLoading.value) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        return ListView.builder(
+          itemCount: productController.productList.length,
+          itemBuilder: (context, index) {
+            final product = productController.productList[index];
+            return ListTile(
+              leading: Image.network(
+                product.image,
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+              ),
+              title: Text(product.title),
+              subtitle: Text('\$${product.price}'),
+              trailing: ElevatedButton(
+                onPressed: () => cartController.addToCart(product),
+                child: Text('Add'),
+              ),
+            );
+          },
+        );
+      }),
     );
   }
 }

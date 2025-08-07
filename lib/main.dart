@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:get_x_darsi/view/screens/home_scree.dart';
+import 'package:get_x_darsi/viewmodel/control.dart';
+import 'package:get_x_darsi/viewmodel/product_controller.dart';
 
-void main() async {
-  await GetStorage.init();
+void main() {
+  Get.put(ProductController());
+  Get.put(CartController());
   runApp(const MyApp());
 }
 
@@ -14,9 +16,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Savatcha',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomeScreen(),
+      title: 'Cart Project',
+      home: HomeScreen(),
     );
   }
 }
